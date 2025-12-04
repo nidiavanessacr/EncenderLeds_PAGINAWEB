@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Control de LEDs</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+      background-color: #f4f4f4;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    .led-control {
+      margin: 30px auto;
+      padding: 20px;
+      width: 300px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .led-control h2 {
+      margin-bottom: 15px;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+
+    .rojo-on { background-color: #e74c3c; }
+    .rojo-off { background-color: #c0392b; }
+
+    .verde-on { background-color: #2ecc71; }
+    .verde-off { background-color: #27ae60; }
+
+    .azul-on { background-color: #3498db; }
+    .azul-off { background-color: #2980b9; }
+
+    .admin-panel {
+      margin: 40px auto;
+      padding: 20px;
+      width: 400px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    input, select {
+      padding: 8px;
+      margin: 5px;
+      width: 90%;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .admin-button {
+      background-color: #8e44ad;
+    }
+
+    .delete-button {
+      background-color: #e74c3c;
+    }
+  </style>
+</head>
+<body>
+  <h1>Control de LEDs vía Web</h1>
+
+  <!-- Controles existentes -->
+  <div class="led-control">
+    <h2>LED Rojo</h2>
+    <button class="rojo-on" onclick="cambiarEstado(1, true)">Encender</button>
+    <button class="rojo-off" onclick="cambiarEstado(1, false)">Apagar</button>
+  </div>
+
+  <div class="led-control">
+    <h2>LED Verde</h2>
+    <button class="verde-on" onclick="cambiarEstado(2, true)">Encender</button>
+    <button class="verde-off" onclick="cambiarEstado(2, false)">Apagar</button>
+  </div>
+
+  <div class="led-control">
+    <h2>LED Azul</h2>
+    <button class="azul-on" onclick="cambiarEstado(3, true)">Encender</button>
+    <button class="azul-off" onclick="cambiarEstado(3, false)">Apagar</button>
+  </div>
+
+  <!-- Panel de administración -->
+  <div class="admin-panel">
+    <h2>Administrar LEDs</h2>
+
+    <h3>Agregar nuevo LED</h3>
+    <input type="number" id="nuevo-id" placeholder="ID">
+    <input type="text" id="nueva-desc" placeholder="Descripción">
+    <select id="nuevo-status">
+      <option value="0">Apagado</option>
+      <option value="1">Encendido</option>
+    </select>
+    <button class="admin-button" onclick="agregarLed()">Agregar</button>
+
+    <h3>Editar descripción</h3>
+    <input type="number" id="editar-id" placeholder="ID del LED">
+    <input type="text" id="editar-desc" placeholder="Nueva descripción">
+    <button class="admin-button" onclick="editarDescripcion()">Actualizar</button>
+
+    <h3>Eliminar LED</h3>
+    <input type="number" id="eliminar-id" placeholder="ID del LED">
+    <button class="delete-button" onclick="eliminarLed()">Eliminar</button>
+  </div>
+
+  <script>
+    const API_URL = "http://192.168.161.49:5000";
+
+    function cambiarEstado(id, estado) {
+      fetch(`${API_URL}/leds/${id}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: estado })
+      })
+      .then(response => response.json())
+      .then(data => alert(data.mensaje))
+      .catch(error => alert("Error al conectar con la API"));
+    }
+
+    function agregarLed() {
+      const id = document.getElementById("nuevo-id").value;
+      const descripcion = document.getElementById("nueva-desc").value;
+      const status = document.getElementById("nuevo-status").value;
+
+      fetch(`${API_URL}/leds`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, descripcion: descripcion, status: status })
+      })
+      .then(res => res.json())
+      .then(data => alert(data.mensaje))
+      .catch(err => alert("Error al agregar LED"));
+    }
+
+    function editarDescripcion() {
+      const id = document.getElementById("editar-id").value;
+      const descripcion = document.getElementById("editar-desc").value;
+
+      fetch(`${API_URL}/leds/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ descripcion: descripcion })
+      })
+      .then(res => res.json())
+      .then(data => alert(data.mensaje))
+      .catch(err => alert("Error al editar descripción"));
+    }
+
+    function eliminarLed() {
+      const id = document.getElementById("eliminar-id").value;
+
+      fetch(`${API_URL}/leds/${id}`, {
+        method: 'DELETE'
+      })
+      .then(res => res.json())
+      .then(data => alert(data.mensaje))
+      .catch(err => alert("Error al eliminar LED"));
+    }
+  </script>
+</body>
+</html>
+
+
