@@ -7,14 +7,14 @@ app = Flask(__name__)
 conexion = MySQL(app)
 
 # ===========================================================
-#   UTILIDAD PARA CIFRAR CONTRASEÑAS
+# CIFRAR CONTRASEÑAS
 # ===========================================================
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
 
 # ===========================================================
-#   ENDPOINTS DE USUARIOS (REGISTER / LOGIN)
+# ENDPOINTS DE USUARIOS (REGISTER / LOGIN)
 # ===========================================================
 
 @app.route("/register", methods=["POST"])
@@ -84,7 +84,7 @@ def login():
 
 
 # ===========================================================
-#   OPCIONAL: LISTAR USUARIOS (DEBUG)
+# LISTAR USUARIOS
 # ===========================================================
 @app.route("/usuarios", methods=["GET"])
 def usuarios():
